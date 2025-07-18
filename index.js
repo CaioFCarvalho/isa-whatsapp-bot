@@ -1,18 +1,14 @@
-const express = require('express');
-const bodyParser = require('body-parser');
 const axios = require('axios');
-
-const app = express();
-app.use(bodyParser.json());
 
 const ZAPI_URL = 'https://api.z-api.io/instances/3E43E8DD1D9DC08F239A669115FAC68F/token/77B09F787B096B72BF713C32/send-text';
 
-app.post('/api/webhook', async (req, res) => {
-  const message = req.body?.message?.text || req.body?.message?.body || req.body?.body;
-  const sender = req.body?.message?.phone || req.body?.phone || req.body?.sender;
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).send('Método não permitido');
+  }
 
-  console.log('Mensagem recebida:', message);
-  console.log('Telefone do remetente:', sender);
+  const message = req.body.message?.text || req.body.message?.body || req.body.body;
+  const sender = req.body.message?.phone || req.body.phone || req.body.sender;
 
   if (message && sender) {
     try {
@@ -20,18 +16,12 @@ app.post('/api/webhook', async (req, res) => {
         phone: sender,
         message: 'Oi! Eu sou a Isa, assistente virtual da BWR. Como posso te ajudar hoje?'
       });
-      res.sendStatus(200);
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error.message);
-      res.sendStatus(500);
+      return res.status(200).send('Mensagem enviada com sucesso');
+    } catch (err) {
+      console.error('Erro ao enviar mensagem:', err.message);
+      return res.status(500).send('Erro ao enviar mensagem');
     }
   } else {
-    console.log('Mensagem ou telefone ausente no body');
-    res.sendStatus(400);
+    return res.status(400).send('Dados inválidos');
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+};
