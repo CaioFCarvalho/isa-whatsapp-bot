@@ -8,14 +8,14 @@ app.use(bodyParser.json());
 const ZAPI_URL = 'https://api.z-api.io/instances/3E43E8DD1D9DC08F239A669115FAC68F/token/77B09F787B096B72BF713C32/send-text';
 
 app.post('/api/webhook', async (req, res) => {
-  const message = req.body.message?.text || req.body.message?.body || req.body.body;
-  const sender = req.body.message?.phone || req.body.phone || req.body.sender;
+  const message = req.body.message?.text;
+  const sender = req.body.message?.from;
 
   if (message && sender) {
     try {
       await axios.post(ZAPI_URL, {
         phone: sender,
-        message: 'Oi! Eu sou a Isa, assistente virtual da BWR. Como posso te ajudar hoje? 😊'
+        message: 'Oi! Eu sou a Isa, assistente virtual da BWR. Como posso te ajudar hoje?'
       });
       res.sendStatus(200);
     } catch (error) {
@@ -23,6 +23,7 @@ app.post('/api/webhook', async (req, res) => {
       res.sendStatus(500);
     }
   } else {
+    console.log('Mensagem ou número não encontrados:', req.body);
     res.sendStatus(400);
   }
 });
