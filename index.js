@@ -8,8 +8,8 @@ app.use(bodyParser.json());
 const ZAPI_URL = 'https://api.z-api.io/instances/3E43E8DD1D9DC08F239A669115FAC68F/token/77B09F787B096B72BF713C32/send-text';
 
 app.post('/api/webhook', async (req, res) => {
-  const message = req.body.message?.text?.body;
-  const sender = req.body.message?.from;
+  const message = req.body.message?.text || req.body.message?.body || req.body.body;
+  const sender = req.body.message?.phone || req.body.phone || req.body.sender;
 
   if (message && sender) {
     try {
