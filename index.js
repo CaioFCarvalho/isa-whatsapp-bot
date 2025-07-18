@@ -8,8 +8,11 @@ app.use(bodyParser.json());
 const ZAPI_URL = 'https://api.z-api.io/instances/3E43E8DD1D9DC08F239A669115FAC68F/token/77B09F787B096B72BF713C32/send-text';
 
 app.post('/api/webhook', async (req, res) => {
-  const message = req.body.message?.text;
-  const sender = req.body.message?.from;
+  const message = req.body?.message?.text || req.body?.message?.body || req.body?.body;
+  const sender = req.body?.message?.phone || req.body?.phone || req.body?.sender;
+
+  console.log('Mensagem recebida:', message);
+  console.log('Telefone do remetente:', sender);
 
   if (message && sender) {
     try {
@@ -23,7 +26,7 @@ app.post('/api/webhook', async (req, res) => {
       res.sendStatus(500);
     }
   } else {
-    console.log('Mensagem ou número não encontrados:', req.body);
+    console.log('Mensagem ou telefone ausente no body');
     res.sendStatus(400);
   }
 });
